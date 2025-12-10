@@ -18,7 +18,7 @@ DB_DSN = 'usddcodb101.CORP.INTRANET:1521/GLWFST1'
 # Extract to variables
 billing_app_id = 'PPP'
 company_owner_id = '4'
-request_id = 'REQ123456789'
+#request_id = 'REQ123456789'
 #date='2018-10-06'
 def connect_to_oracle():
     try:
@@ -44,15 +44,15 @@ logging.info(f'Script started at: {start_time}')
 
 queries = [
    # f"Delete from GL_DETAIL_GLWF where APPLICATION_ID ='{billing_app_id}' and COMPANY_OWNER_ID = '{company_owner_id}' and REQUEST_ID='{request_id}' ",
-    f"Delete from GLWF.SERV_REQ_DET_GLWF where BILLING_APPLICATION_ID= '{billing_app_id}' and COMPANY_OWNER_ID = '{company_owner_id}' and REQUEST_ID='{request_id}' "]
+    f"Delete from GLWF.SERV_REQ_DET_GLWF where BILLING_APPLICATION_ID= '{billing_app_id}' and COMPANY_OWNER_ID = '{company_owner_id}'  "]
 print("queries defined successfully")
 
 
-def execute_delete_queries(queries, batch_size=10000):
+def execute_delete_queries(queries, batch_size=5000):
     connection = None
     curs = None
     total_rows_deleted = 0
-
+    max_total_delete = 10000  # Set a maximum limit to avoid infinite loops
     try:
         connection = connect_to_oracle()
         if connection is None:
@@ -60,6 +60,9 @@ def execute_delete_queries(queries, batch_size=10000):
             return False, 0
 
         for i, base_query in enumerate(queries, 1):
+             if total_rows_deleted >= max_total_delete:
+                print(f"Reached maximum total delete limit of {max_total_delete}. Stopping further deletions.")
+                break
             while True:
                 # Add ROWNUM condition for batch delete
                 if "where" in base_query.lower():
@@ -107,7 +110,7 @@ def execute_delete_queries(queries, batch_size=10000):
             print("Database connection closed")
 
 # Execute the deletion
-success, total_deleted = execute_delete_queries(queries,batch_size=10000)
+success, total_deleted = execute_delete_queries(queries,batch_size=5000)
 
 send_email_notification({
     'status': 'SUCCESS' if total_deleted > 0 else 'NO_DATA',
