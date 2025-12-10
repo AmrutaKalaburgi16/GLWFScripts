@@ -60,10 +60,11 @@ def execute_delete_queries(queries, batch_size=5000):
             return False, 0
 
         for i, base_query in enumerate(queries, 1):
-            if total_rows_deleted >= max_total_delete:
-                print(f"Reached maximum total delete limit of {max_total_delete}. Stopping further deletions.")
-                break
+            
             while True:
+                if total_rows_deleted >= max_total_delete:
+                    print(f"Reached maximum total delete limit of {max_total_delete}. Stopping further deletions.")
+                    break
                 # Add ROWNUM condition for batch delete
                 if "where" in base_query.lower():
                     batch_query = base_query.rstrip() + f" AND ROWNUM <= {batch_size}"
