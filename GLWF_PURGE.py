@@ -52,7 +52,7 @@ def execute_delete_queries(queries, batch_size=5000):
     connection = None
     curs = None
     total_rows_deleted = 0
-    max_total_delete = 10000  # Set a maximum limit to avoid infinite loops
+    #max_total_delete = 10000  # Set a maximum limit to avoid infinite loops
     try:
         connection = connect_to_oracle()
         if connection is None:
@@ -62,9 +62,9 @@ def execute_delete_queries(queries, batch_size=5000):
         for i, base_query in enumerate(queries, 1):
             
             while True:
-                if total_rows_deleted >= max_total_delete:
-                    print(f"Reached maximum total delete limit of {max_total_delete}. Stopping further deletions.")
-                    break
+                # if total_rows_deleted >= max_total_delete:
+                #     print(f"Reached maximum total delete limit of {max_total_delete}. Stopping further deletions.")
+                #     break
                 # Add ROWNUM condition for batch delete
                 if "where" in base_query.lower():
                     batch_query = base_query.rstrip() + f" AND ROWNUM <= {batch_size}"
