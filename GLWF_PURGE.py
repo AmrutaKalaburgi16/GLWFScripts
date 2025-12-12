@@ -2,7 +2,7 @@ import datetime
 import logging
 import cx_Oracle
 import os
-
+import re
 from util import send_email_notification
 
 # Database connection parameters
