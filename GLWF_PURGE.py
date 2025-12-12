@@ -43,12 +43,12 @@ logging.info(f'Script started at: {start_time}')
 
 
 queries = [
-   # f"Delete from GL_DETAIL_GLWF where APPLICATION_ID ='{billing_app_id}' and COMPANY_OWNER_ID = '{company_owner_id}' and REQUEST_ID='{request_id}' ",
-    f"Delete from GLWF.SERV_REQ_DET_GLWF_BKP12DEC where BILLING_APPLICATION_ID= '{billing_app_id}' and COMPANY_OWNER_ID = '{company_owner_id}'  "]
+    f"Delete from GLWF.GL_DETAIL_GLWF_BKP12DEC where APPLICATION_ID ='{billing_app_id}' and COMPANY_OWNER_ID = '{company_owner_id}' ",
+   # f"Delete from GLWF.SERV_REQ_DET_GLWF_BKP12DEC where BILLING_APPLICATION_ID= '{billing_app_id}' and COMPANY_OWNER_ID = '{company_owner_id}'  "]
 print("queries defined successfully")
 
 
-def execute_delete_queries(queries, batch_size=5000):
+def execute_delete_queries(queries, batch_size=10000):
     connection = None
     curs = None
     total_rows_deleted = 0
@@ -111,7 +111,7 @@ def execute_delete_queries(queries, batch_size=5000):
             print("Database connection closed")
 
 # Execute the deletion
-success, total_deleted = execute_delete_queries(queries,batch_size=5000)
+success, total_deleted = execute_delete_queries(queries,batch_size=10000)
 
 send_email_notification({
     'status': 'SUCCESS' if total_deleted > 0 else 'NO_DATA',
