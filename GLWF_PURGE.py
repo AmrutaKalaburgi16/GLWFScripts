@@ -43,7 +43,7 @@ logging.info(f'Script started at: {start_time}')
 
 
 queries = [
-   # f"Delete from GLWF.GL_DETAIL_GLWF where APPLICATION_ID ='{billing_app_id}' and COMPANY_OWNER_ID = '{company_owner_id}' ",
+    f"Delete from GLWF.GL_DETAIL_GLWF where APPLICATION_ID ='{billing_app_id}' and COMPANY_OWNER_ID = '{company_owner_id}' and request_id='{request_id}' ",
     f"Delete from GLWF.SERV_REQ_DET_GLWF where BILLING_APPLICATION_ID= '{billing_app_id}' and COMPANY_OWNER_ID = '{company_owner_id}' and request_id='{request_id}' "]
 print("queries defined successfully")
 
