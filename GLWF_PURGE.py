@@ -18,7 +18,7 @@ DB_DSN = 'usddcodb101.CORP.INTRANET:1521/GLWFST1'
 # Extract to variables
 billing_app_id = 'PPP'
 company_owner_id = '4'
-#request_id = 'REQ123456789'
+request_id = 'REQ123456789'
 #date='2018-10-06'
 def connect_to_oracle():
     try:
@@ -43,8 +43,8 @@ logging.info(f'Script started at: {start_time}')
 
 
 queries = [
-    f"Delete from GLWF.GL_DETAIL_GLWF_BKP12DEC where APPLICATION_ID ='{billing_app_id}' and COMPANY_OWNER_ID = '{company_owner_id}' "]
-   # f"Delete from GLWF.SERV_REQ_DET_GLWF_BKP12DEC where BILLING_APPLICATION_ID= '{billing_app_id}' and COMPANY_OWNER_ID = '{company_owner_id}'  "]
+   # f"Delete from GLWF.GL_DETAIL_GLWF where APPLICATION_ID ='{billing_app_id}' and COMPANY_OWNER_ID = '{company_owner_id}' ",
+    f"Delete from GLWF.SERV_REQ_DET_GLWF where BILLING_APPLICATION_ID= '{billing_app_id}' and COMPANY_OWNER_ID = '{company_owner_id}' and request_id='{request_id}' "]
 print("queries defined successfully")
 
 
@@ -60,7 +60,11 @@ def execute_delete_queries(queries, batch_size=10000):
             return False, 0
 
         for i, base_query in enumerate(queries, 1):
-            
+            table_match = re.search(r'FROM\s+([\w.]+)', base_query, re.IGNORECASE)
+            if table_match:
+                table_name = table_match.group(1)
+                print(f"Processing table: {table_name}")
+                logging.info(f"Processing table: {table_name}")
             while True:
                 # if total_rows_deleted >= max_total_delete:
                 #     print(f"Reached maximum total delete limit of {max_total_delete}. Stopping further deletions.")
@@ -95,7 +99,8 @@ def execute_delete_queries(queries, batch_size=10000):
                     break
                 finally:
                     curs.close()
-            print(f"Total deleted for query {i}: {total_rows_deleted}")
+            print(f"Total deleted for query {i}-{table_name}: {total_rows_deleted}")
+            logging.info(f"Total deleted for query {i}-{table_name}: {total_rows_deleted}")
        
         return True, total_rows_deleted
     except cx_Oracle.DatabaseError as e:
@@ -120,8 +125,11 @@ send_email_notification({
     'total_deleted': total_deleted  # Use total_deleted, not row_count
 }, __file__)
 
+logging.info("\n----------------------------------------------")
+logging.info(f"Purge SUMMARY:")
 print(f"Purge SUMMARY:")
-print(f"Total records deleted: {total_deleted:,}")
+print(f"Total records deleted successfully : {total_deleted:,}")
+logging.info(f"Total records deleted successfully : {total_deleted:,}")
 end_time = datetime.datetime.now()
 print(f'Script ended at: {end_time}')
 logging.info(f'Script ended at: {end_time}')
